@@ -124,7 +124,7 @@ const addDepartment = () => {
     }]).then((answer) =>{
         connection.query('INSERT INTO department (department_name) VALUES (?)', answer.newDepartment, (err, result) => {
             if (err) throw err;
-            console.log(answer.newDepartment + ' has been added to departments.');
+            console.log(answer.newDepartment + ' has been added to departments successfully.');
             mainMenu();
         })
     })
@@ -132,15 +132,98 @@ const addDepartment = () => {
 
 // Add role
 const addRole = () => {
-
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'newRole',
+            message: 'What role would you like to add?',
+            validate: newRole => {
+                if (newRole) {
+                    return true;
+                } else {
+                    console.log('Please enter a role!')
+                    return false;
+                    }
+                }
+        },
+        {
+            type: 'input',
+            name: 'newSalary',
+            message: 'What will the salary be for this role?',
+            validate: newSalary => {
+                if (newSalary) {
+                    return true;
+                } else {
+                    console.log('Please enter a salary!')
+                    return false;
+                    }
+                }
+        },
+        {
+            type: 'input',
+            name: 'newDepartmentId',
+            message: 'What will the salary be for this role?',
+            validate: newDepartmentId => {
+                if (newDepartmentId) {
+                    return true;
+                } else {
+                    console.log('Please enter a department ID!')
+                    return false;
+                    }
+                }
+        }
+    ]).then((answer) =>{
+        connection.query('INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)', [answer.newRole, answer.newSalary, answer.newDepartmentId], (err, result) => {
+            if (err) throw err;
+            console.log(answer.newRole + ' has been added successfully.');
+            mainMenu();
+        })
+    })
+    
 };
 
 // Add employee
-const addEmployee = () => {
+// const addEmployee = () => {
+//     inquirer.prompt([{
+//         type: 'input',
+//         name: 'newEmployee',
+//         message: 'What employee would you like to add?',
+//         validate: newEmployee => {
+//             if (newEmployee) {
+//                 return true;
+//             } else {
+//                 console.log('Please enter a employee!')
+//                 return false;
+//             }
+//         }
+//     }]).then((answer) =>{
+//         connection.query('INSERT INTO employee (title) VALUES (?)', answer.newEmployee, (err, result) => {
+//             if (err) throw err;
+//             console.log(answer.newEmployee + ' has been added to employees.');
+//             mainMenu();
+//         })
+//     })
 
-};
+// };
 
 // Update employee role
 const updateEmployeeRole = () => {
 
 };
+
+const updateEmployeeManagers = () => {
+
+};
+
+const viewEmployeesByManager = () => {
+
+};
+
+const viewEmployeesByDepartment = () => {
+
+};
+
+const deleteDeptRolesEmployees = () => {
+
+};
+
