@@ -1,4 +1,5 @@
 // Dependencies
+require('dotenv').config();
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
@@ -8,7 +9,7 @@ const connection = mysql.createConnection(
     {
     host: 'localhost',
     user: 'root',
-    password: 'OSU123',
+    password: process.env.PASSWORD,
     database: 'employee_db'
     },    
 );
@@ -162,7 +163,7 @@ const addRole = () => {
         {
             type: 'input',
             name: 'newDepartmentId',
-            message: 'What will the salary be for this role?',
+            message: `What is the new department's ID?`,
             validate: newDepartmentId => {
                 if (newDepartmentId) {
                     return true;
