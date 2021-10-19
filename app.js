@@ -76,7 +76,7 @@ const mainMenu = () => {
 const viewAllDepartments = () => {
     console.log(dash);
     console.log('');
-    connection.query('SELECT * FROM department', (err, results) => {
+    connection.query('SELECT department_name, id FROM department', (err, results) => {
         console.table(results);
         console.log(dash);
         console.log('');
@@ -84,11 +84,11 @@ const viewAllDepartments = () => {
     });
 };
 
-// View employees by roles
+// View all employee roles
 const viewAllRoles = () => {
     console.log(dash);
     console.log('');
-    connection.query('SELECT * FROM roles', (err, results) => {
+    connection.query('SELECT roles.title, roles.id, department.department_name, roles.salary FROM roles INNER JOIN department ON roles.department_id=department.id', (err, results) => {
         console.table(results);
         console.log(dash);
         console.log('');
@@ -100,7 +100,8 @@ const viewAllRoles = () => {
 const viewAllEmployees = () => {
     console.log(dash);
     console.log('');
-    connection.query('SELECT * FROM employee', (err, results) => {
+    connection.query("SELECT employee.id AS ID, CONCAT(employee.first_name, ' ', employee.last_name) AS Employee_Name, roles.title AS Title, department.department_name AS Department, roles.salary AS Salary FROM ((employee INNER JOIN roles ON roles.id=employee.role_id) INNER JOIN department ON roles.department_id=department.id);", (err, results) => {
+        console.log(err);
         console.table(results);
         console.log(dash);
         console.log('');
@@ -148,7 +149,7 @@ const addRole = () => {
                 }
         },
         {
-            type: 'input',
+            type: 'number',
             name: 'newSalary',
             message: 'What will the salary be for this role?',
             validate: newSalary => {
@@ -161,7 +162,7 @@ const addRole = () => {
                 }
         },
         {
-            type: 'input',
+            type: 'number',
             name: 'newDepartmentId',
             message: `What is the new department's ID?`,
             validate: newDepartmentId => {
@@ -183,29 +184,70 @@ const addRole = () => {
     
 };
 
-// Add employee
-// const addEmployee = () => {
-//     inquirer.prompt([{
-//         type: 'input',
-//         name: 'newEmployee',
-//         message: 'What employee would you like to add?',
-//         validate: newEmployee => {
-//             if (newEmployee) {
-//                 return true;
-//             } else {
-//                 console.log('Please enter a employee!')
-//                 return false;
-//             }
-//         }
-//     }]).then((answer) =>{
-//         connection.query('INSERT INTO employee (title) VALUES (?)', answer.newEmployee, (err, result) => {
-//             if (err) throw err;
-//             console.log(answer.newEmployee + ' has been added to employees.');
-//             mainMenu();
-//         })
-//     })
-
-// };
+// Add an employee
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'newFirstName',
+            message: 'What is the first name of the new employee?',
+            validate: newFirstName => {
+                if (newFirstName) {
+                    return true;
+                } else {
+                    console.log('Please enter a first name!')
+                    return false;
+                    }
+                }
+        },
+        {
+            type: 'input',
+            name: 'newLastName',
+            message: 'What is the Last name of the new employee?',
+            validate: newLastName => {
+                if (newLastName) {
+                    return true;
+                } else {
+                    console.log('Please enter a last name!')
+                    return false;
+                    }
+                }
+        },
+        {
+            type: 'number',
+            name: 'newRoleId',
+            message: `What is the new employee's role ID?`,
+            validate: newRoleId => {
+                if (newRoleId) {
+                    return true;
+                } else {
+                    console.log('Please enter a role ID!')
+                    return false;
+                    }
+                }
+        },
+        {
+            type: 'number',
+            name: 'newManagerId',
+            message: `What is the new employee's manager's ID?`,
+            validate: newManagerId => {
+                if (newManagerId) {
+                    return true;
+                } else {
+                    console.log('Please enter a manager ID!')
+                    return false;
+                    }
+                }
+        }
+    ]).then((answer) =>{
+        connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)', [answer.newFirstName, answer.newLastName, answer.newRoleId, answer.newManagerId], (err, result) => {
+            if (err) throw err;
+            console.log(answer.newFirstName + ' ' + answer.newLastName + ' has been added successfully.');
+            mainMenu();
+        })
+    })
+    
+};
 
 // Update employee role
 const updateEmployeeRole = () => {
@@ -228,3 +270,4 @@ const deleteDeptRolesEmployees = () => {
 
 };
 
+// connection.query("SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, CONCAT(employee.first_name, ' ', employee.last_name) AS Manager FROM employee INNER JOIN roles on roles.id=employee.role_id INNER JOIN department on department.id=roles.department_id LEFT JOIN employee ON employee.manager_id=employee.id;", (err, results) => {
