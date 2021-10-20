@@ -28,6 +28,10 @@ connection.connect((err) => {
 
 // Main menu
 const mainMenu = () => {
+    console.log('');
+    console.log('');
+    console.log('Main Menu');
+    console.log('');
     inquirer.prompt([{
         type: 'list',
         message: "Please choose an option:",
@@ -66,7 +70,9 @@ const mainMenu = () => {
                 updateEmployeeRole();
                 break;
             default:
-                connection.end()
+                connection.end();
+                console.log("");
+                console.log("Good Bye!");
                 break;                
         }
     })
@@ -76,7 +82,7 @@ const mainMenu = () => {
 const viewAllDepartments = () => {
     console.log(dash);
     console.log('');
-    connection.query('SELECT department_name, id FROM department', (err, results) => {
+    connection.query('SELECT department_name AS Department, id AS ID FROM department', (err, results) => {
         console.table(results);
         console.log(dash);
         console.log('');
@@ -88,7 +94,8 @@ const viewAllDepartments = () => {
 const viewAllRoles = () => {
     console.log(dash);
     console.log('');
-    connection.query('SELECT roles.title, roles.id, department.department_name, roles.salary FROM roles INNER JOIN department ON roles.department_id=department.id', (err, results) => {
+    connection.query('SELECT roles.title AS "Job Title", roles.id AS ID, department.department_name AS Department, CONCAT("\$",roles.salary) AS Salary FROM roles INNER JOIN department ON roles.department_id=department.id', (err, results) => {
+        if (err) throw err;
         console.table(results);
         console.log(dash);
         console.log('');
@@ -100,8 +107,8 @@ const viewAllRoles = () => {
 const viewAllEmployees = () => {
     console.log(dash);
     console.log('');
-    connection.query("SELECT employee.id AS ID, CONCAT(employee.first_name, ' ', employee.last_name) AS Employee_Name, roles.title AS Title, department.department_name AS Department, roles.salary AS Salary FROM ((employee INNER JOIN roles ON roles.id=employee.role_id) INNER JOIN department ON roles.department_id=department.id);", (err, results) => {
-        console.log(err);
+    connection.query("SELECT employee.id AS ID, CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name', roles.title AS Title, department.department_name AS Department, CONCAT('\$',roles.salary) AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager FROM employee INNER JOIN roles ON roles.id=employee.role_id INNER JOIN department ON roles.department_id=department.id LEFT JOIN employee manager ON employee.manager_id=manager.id;", (err, results) => {
+        if (err) throw err;
         console.table(results);
         console.log(dash);
         console.log('');
@@ -251,23 +258,49 @@ const addEmployee = () => {
 
 // Update employee role
 const updateEmployeeRole = () => {
+    
 
+    connection.query('SELECT * FROM employee;', (err,data) => {
+        if (err) throw err;
+        const allEmployees = data.map(({id, first_name, last_name}) => ({name: first_name + ' ' + last_name, value: id}));
+
+        
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employeeName',
+                message: "Which employee would you like to update?",
+                choices: allEmployees
+                
+            }
+        ]).then((answers) => {
+            const selectedEmployee = answers.employeeName;
+            console.log(selectedEmployee);
+            
+            connection.query('SELECT * FROM roles;', (err, data) => {
+                if (err) throw err;
+                const allRoles = data.map(({id, title}) => ({name: title, value: id}));
+                
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'employeeRole',
+                        message: `What is the new role of ${selectedEmployee}?`,
+                        choices: allRoles
+                    }
+                ]).then((answers) => {
+                    const selectedRole = answers.employeeRole;
+                    console.log(selectedRole);
+                    
+
+                    connection.query('UPDATE employee SET role_id=? WHERE id=?', [selectedRole, selectedEmployee], (err, result) => {
+                        if (err) throw err;
+                        console.log("The employee's role has been successfully updated.");
+                        mainMenu();
+
+                    });
+                });
+            });
+        });
+    });
 };
-
-const updateEmployeeManagers = () => {
-
-};
-
-const viewEmployeesByManager = () => {
-
-};
-
-const viewEmployeesByDepartment = () => {
-
-};
-
-const deleteDeptRolesEmployees = () => {
-
-};
-
-// connection.query("SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, CONCAT(employee.first_name, ' ', employee.last_name) AS Manager FROM employee INNER JOIN roles on roles.id=employee.role_id INNER JOIN department on department.id=roles.department_id LEFT JOIN employee ON employee.manager_id=employee.id;", (err, results) => {
