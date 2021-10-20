@@ -275,7 +275,6 @@ const updateEmployeeRole = () => {
             }
         ]).then((answers) => {
             const selectedEmployee = answers.employeeName;
-            console.log(selectedEmployee);
             
             connection.query('SELECT * FROM roles;', (err, data) => {
                 if (err) throw err;
@@ -290,7 +289,6 @@ const updateEmployeeRole = () => {
                     }
                 ]).then((answers) => {
                     const selectedRole = answers.employeeRole;
-                    console.log(selectedRole);
                     
 
                     connection.query('UPDATE employee SET role_id=? WHERE id=?', [selectedRole, selectedEmployee], (err, result) => {
