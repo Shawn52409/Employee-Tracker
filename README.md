@@ -36,6 +36,9 @@ A user will need to download and install node.js, npm Inquirer, npm dotenv, npm 
 # Appearance
 ![Screenshot of README and command line](./img/screenshot.jpg)
 
+- The following link is a walkthrough video that demonstrates the functionality of the Employee Tracker app working in node.js.
+https://watch.screencastify.com/v/z7YZbLiU1EX3umYuEXc9
+
 # Known Bugs
 No known bugs.
 
